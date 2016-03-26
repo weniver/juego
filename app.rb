@@ -50,32 +50,28 @@ get "/fight/:attacker" do |attacker|
 	enemy = attacker.to_i == 0 ? 1 : 0;
 	turn = attacker.to_i + 1
 	enemigos = session[:parties][enemy].each_with_index.map { |w, index|
-			health = w.health
-			name = w.name
-		%{<input type="radio" name="warrior" value="#{index}" />#{name} Warrior HP: #{health}<br/>}
+			{
+				name: w.name,
+				health: w.health,
+				index: index
+			}
+	}
+
+	atacantes = session[:parties][attacker.to_i].each.map { |w|
+			{
+				name: w.name,
+				health: w.health,
+				attack: w.strength
+			}
+
 	}
 	
-	atacantes = session[:parties][attacker.to_i].each.map { |w|
-			health = w.health
-			name = w.name
-			attack = w.strength
-		%{<li>#{name} Warrior: #{health}hp -- #{attack} attack.</li>}
-	}
-
-	<<-HTML
-	<h1><u>Player #{turn} turn</u></h1>
-	<h3>Attacking team order:</h3>
-	<ol>
-		#{atacantes.join('')}
-	</ol>
-	<h3>Enemy team:</h3>
-	<form method="post" action="/attack/#{attacker}/#{enemy}">
-  	#{enemigos.join('')}
-  	<button type="submit">Attack!</button>
-	</form>
-	HTML
+	erb(:"attack/menu", locals: {
+		enemigos: enemigos,
+		atacantes: atacantes,
+		turn: turn
+	})
 end
-
 
 post "/attack/:attacker/:enemy" do |attacker, enemy|
 
