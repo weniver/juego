@@ -1,4 +1,7 @@
-require 'sinatra'
+require 'rubygems'
+require 'bundler'
+Bundler.require
+
 require './lib/warrior.rb'
 
 enable :sessions
