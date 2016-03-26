@@ -7,6 +7,7 @@ require './lib/warrior.rb'
 enable :sessions
 
 get '/' do
+	puts params.inspect
 	"<a href='/play'>PLAY</a>"
 end
 
@@ -16,20 +17,12 @@ get '/play' do
 end
 
 get "/teams/:qty" do |qty|
-	players = []
-	(1..qty.to_i).each do |player|
-		players << erb(:team_select, layout: nil, locals: {
-			player: player
-		})
-	end
+	players = (1..qty.to_i)
 
-	<<-HTML
-	<form action="/play/#{qty}" method="post" id="player1">
-	  <h1>Select your team:</h1>
-	 	#{players.join('')}
-		<input type="submit" value="FIGHT">
-	</form>
-	HTML
+	erb(:"team/select", layout: nil, locals: {
+			qty: qty,
+			players: players
+		})
 end
 
 
@@ -99,7 +92,7 @@ post "/attack/:attacker/:enemy" do |attacker, enemy|
 
 	if session[:parties][enemy.to_i].empty?
 		winner = enemy.to_i == 0 ? 2 : 1;
-		redirect to "victory/#{'player '+winner.to_s}"
+		redirect to "victory/player #{winner}"
 
 	elsif session[:qty] == 1
 			comp_attacker = session[:parties][1].first
