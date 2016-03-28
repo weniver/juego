@@ -11,13 +11,10 @@
 <h3>Enemy team:</h3>
 
 <form method="post" action="/attack/<%= attacker %>/<%= enemy %>">
-	<ul>
 		<% enemigos.each do |enemigo| %>
-		<li>
 			<input type="radio" name="warrior" value="<%= enemigo[:index] %>" id="warrior-<%= enemigo[:index] %>"/>
 			<label for="warrior-<%= enemigo[:index] %>"><%= enemigo[:name] %> Warrior HP: <%= enemigo[:health] %></label>
-		</li>
+		</br>
 		<% end %>
-	</ul>
   <button type="submit">Attack!</button>
 </form>
