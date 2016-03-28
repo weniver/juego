@@ -1,32 +1,26 @@
-require 'sinatra'
+require 'rubygems'
+require 'bundler'
+Bundler.require
+
 require './lib/warrior.rb'
 
 enable :sessions
 
 get '/' do
-	"<a href='/play'>PLAY</a>"
+	erb :'home/home'
 end
 
 get '/play' do
-	"<p><a href='/teams/1'>1 Player</a></p>
-	 <p><a href='/teams/2'>2 Players</a></p>"
+	erb :'play/play'
 end
 
 get "/teams/:qty" do |qty|
-	players = []
-	(1..qty.to_i).each do |player|
-		players << erb(:team_select, layout: nil, locals: {
-			player: player
-		})
-	end
+	players = (1..qty.to_i)
 
-	<<-HTML
-	<form action="/play/#{qty}" method="post" id="player1">
-	  <h1>Select your team:</h1>
-	 	#{players.join('')}
-		<input type="submit" value="FIGHT">
-	</form>
-	HTML
+	erb(:"team/select", layout: nil, locals: {
+			qty: qty,
+			players: players
+		})
 end
 
 
@@ -54,36 +48,34 @@ get "/fight/:attacker" do |attacker|
 	enemy = attacker.to_i == 0 ? 1 : 0;
 	turn = attacker.to_i + 1
 	enemigos = session[:parties][enemy].each_with_index.map { |w, index|
-			health = w.health
-			name = w.name
-		%{<input type="radio" name="warrior" value="#{index}" />#{name} Warrior HP: #{health}<br/>}
+			{
+				name: w.name,
+				health: w.health,
+				index: index
+			}
+	}
+
+	atacantes = session[:parties][attacker.to_i].each.map { |w|
+			{
+				name: w.name,
+				health: w.health,
+				attack: w.strength
+			}
+
 	}
 	
-	atacantes = session[:parties][attacker.to_i].each.map { |w|
-			health = w.health
-			name = w.name
-			attack = w.strength
-		%{<li>#{name} Warrior: #{health}hp -- #{attack} attack.</li>}
-	}
-
-	<<-HTML
-	<h1><u>Player #{turn} turn</u></h1>
-	<h3>Attacking team order:</h3>
-	<ol>
-		#{atacantes.join('')}
-	</ol>
-	<h3>Enemy team:</h3>
-	<form method="post" action="/attack/#{attacker}/#{enemy}">
-  	#{enemigos.join('')}
-  	<button type="submit">Attack!</button>
-	</form>
-	HTML
+	erb(:"attack/menu", locals: {
+		enemigos: enemigos,
+		atacantes: atacantes,
+		turn: turn,
+		enemy: enemy,
+		attacker: attacker
+	})
 end
-
 
 post "/attack/:attacker/:enemy" do |attacker, enemy|
 
-	atacante =  session[:parties][attacker.to_i].first
+	atacante = session[:parties][attacker.to_i].first
 	enemigo = session[:parties][enemy.to_i][params[:warrior].to_i]
 
 	atacante.attack(enemigo)
@@ -96,7 +88,7 @@ post "/attack/:attacker/:enemy" do |attacker, enemy|
 
 	if session[:parties][enemy.to_i].empty?
 		winner = enemy.to_i == 0 ? 2 : 1;
-		redirect to "victory/#{'player '+winner.to_s}"
+		redirect to "victory/player%20#{winner}"
 
 	elsif session[:qty] == 1
 			comp_attacker = session[:parties][1].first
@@ -122,6 +114,7 @@ end
 
 get "/victory/:player" do
 	winner = params[:player].capitalize
-	"<h1>#{winner} wins!</h1>
-	<p><a href='/play'>Rematch?</a></p>"
+	erb(:'victory/player', locals: {
+		winner: winner
+	})
 end

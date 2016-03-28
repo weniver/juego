@@ -1,0 +1,23 @@
+<h1>Player <%= turn %> turn</h1>
+<h3>Attacking team order:</h3>
+
+<ol>
+<% atacantes.each do |atacante| %>
+
+	<li><%= atacante[:name] %> Warrior: <%= atacante[:health] %>hp -- <%= atacante[:attack]%>attack.</li>
+	<% end %>
+</ol>
+
+<h3>Enemy team:</h3>
+
+<form method="post" action="/attack/<%= attacker %>/<%= enemy %>">
+	<ul>
+		<% enemigos.each do |enemigo| %>
+		<li>
+			<input type="radio" name="warrior" value="<%= enemigo[:index] %>" id="warrior-<%= enemigo[:index] %>"/>
+			<label for="warrior-<%= enemigo[:index] %>"><%= enemigo[:name] %> Warrior HP: <%= enemigo[:health] %></label>
+		</li>
+		<% end %>
+	</ul>
+  <button type="submit">Attack!</button>
+</form>

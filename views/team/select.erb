@@ -1,0 +1,39 @@
+<form action="/play/<%= qty %>" method="post">
+  <h1>Select your team:</h1>
+  <% players.each do |player| %>
+    Player <%= player %>:
+    <br>
+    <select name="player[<%= player %>][]">
+      <option value="normal">Normal</option>
+      <option value="strong">Strong</option>
+      <option value="fast">Fast</option>
+    </select>
+    <br>
+    <select name="player[<%= player %>][]">
+      <option value="normal">Normal</option>
+      <option selected value="strong">Strong</option>
+      <option value="fast">Fast</option>
+    </select>
+    <br>
+    <select name="player[<%= player %>][]">
+      <option value="normal">Normal</option>
+      <option value="strong">Strong</option>
+      <option selected value="fast">Fast</option>
+    </select>
+    <br>
+    <select name="player[<%= player %>][]">
+      <option value="normal">Normal</option>
+      <option value="strong">Strong</option>
+      <option value="fast">Fast</option>
+    </select>
+    <br>
+    <select name="player[<%= player %>][]">
+      <option value="normal">Normal</option>
+      <option selected value="strong">Strong</option>
+      <option value="fast">Fast</option>
+    </select>
+    <br>
+    <br>
+  <% end %>
+  <input type="submit" value="FIGHT">
+</form>
