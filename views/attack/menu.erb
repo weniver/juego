@@ -10,7 +10,7 @@
 
 <h3>Enemy team:</h3>
 
-<form method="post" action="/attack/#{attacker}/#{enemy}">
+<form method="post" action="/attack/<%= attacker %>/<%= enemy %>">
 	<ul>
 		<% enemigos.each do |enemigo| %>
 		<li>

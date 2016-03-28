@@ -7,13 +7,11 @@ require './lib/warrior.rb'
 enable :sessions
 
 get '/' do
-	puts params.inspect
-	"<a href='/play'>PLAY</a>"
+	erb :'home/home'
 end
 
 get '/play' do
-	"<p><a href='/teams/1'>1 Player</a></p>
-	 <p><a href='/teams/2'>2 Players</a></p>"
+	erb :'play/play'
 end
 
 get "/teams/:qty" do |qty|
@@ -69,13 +67,15 @@ get "/fight/:attacker" do |attacker|
 	erb(:"attack/menu", locals: {
 		enemigos: enemigos,
 		atacantes: atacantes,
-		turn: turn
+		turn: turn,
+		enemy: enemy,
+		attacker: attacker
 	})
 end
 
 post "/attack/:attacker/:enemy" do |attacker, enemy|
 
-	atacante =  session[:parties][attacker.to_i].first
+	atacante = session[:parties][attacker.to_i].first
 	enemigo = session[:parties][enemy.to_i][params[:warrior].to_i]
 
 	atacante.attack(enemigo)
@@ -88,7 +88,7 @@ post "/attack/:attacker/:enemy" do |attacker, enemy|
 
 	if session[:parties][enemy.to_i].empty?
 		winner = enemy.to_i == 0 ? 2 : 1;
-		redirect to "victory/player #{winner}"
+		redirect to "victory/player%20#{winner}"
 
 	elsif session[:qty] == 1
 			comp_attacker = session[:parties][1].first
@@ -114,6 +114,7 @@ end
 
 get "/victory/:player" do
 	winner = params[:player].capitalize
-	"<h1>#{winner} wins!</h1>
-	<p><a href='/play'>Rematch?</a></p>"
+	erb(:'victory/player', locals: {
+		winner: winner
+	})
 end
