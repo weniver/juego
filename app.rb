@@ -18,16 +18,18 @@ get '/play' do
 	erb :'play/play'
 end
 
-get '/log_in'
+get '/log_in' do
+	erb :'log_in/form'
 end
 
-post '/log_in'
+post '/log_in' do
 end
 
-get '/sign_up'
+get '/sign_up' do
+	erb :'sign_up/form'
 end
 
-post '/sign_up'
+post '/sign_up' do
 end
 
 get "/teams/:qty" do |qty|
