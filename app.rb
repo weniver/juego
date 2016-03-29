@@ -10,8 +10,24 @@ get '/' do
 	erb :'home/home'
 end
 
+get '/play/as' do
+	erb :'play/as'
+end
+
 get '/play' do
 	erb :'play/play'
+end
+
+get '/log_in'
+end
+
+post '/log_in'
+end
+
+get '/sign_up'
+end
+
+post '/sign_up'
 end
 
 get "/teams/:qty" do |qty|
@@ -22,7 +38,6 @@ get "/teams/:qty" do |qty|
 			players: players
 		})
 end
-
 
 post "/play/:qty" do |qty|
 	parties = []
@@ -35,12 +50,12 @@ post "/play/:qty" do |qty|
 
 	if qty.to_i == 1
 		parties[1] = []
-		5.times do 
+		5.times do
 			parties[1] << Warrior.send(['normal','strong','fast'].sample)
 		end
 	end
 	session[:parties] = parties
-	redirect to ("/fight/0")	
+	redirect to ("/fight/0")
 end
 
 
@@ -63,7 +78,7 @@ get "/fight/:attacker" do |attacker|
 			}
 
 	}
-	
+
 	erb(:"attack/menu", locals: {
 		enemigos: enemigos,
 		atacantes: atacantes,
