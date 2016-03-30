@@ -3,8 +3,8 @@ require 'bundler'
 Bundler.require
 
 require './lib/warrior.rb'
+enable :sessions
 
-=begin
 before do
 	db = Sequel.sqlite
 
@@ -15,13 +15,12 @@ before do
 			String :email
 			Integer :victories
 			Integer :losses
-		end
+	end
 
+	configure do
 		set :db, db
+	end
 end
-=end
-
-enable :sessions
 
 get '/' do
 	erb :'home/home'
@@ -40,6 +39,13 @@ get '/log_in' do
 end
 
 post '/log_in' do
+	request = settings.db[:users].filter({username: params[:usuario]}).first
+	if !request.nil? && (request[:password] == params[:password])
+		session[:usuario] = request
+		redirect to '/play'
+	else
+		erb :'log_in/wrong_password'
+	end
 end
 
 get '/sign_up' do
@@ -48,7 +54,7 @@ end
 
 post '/sign_up' do
 	encrypted_password = BCrypt::Password.create(params[:password])
-	#settings.db.users.insert(username: params[:usuario], password: encrypted_password], email: params[:email], victories: 0, losses: 0)
+	settings.db.users.insert(username: params[:usuario], password: encrypted_password, email: params[:email], victories: 0, losses: 0)
 	redirect to '/log_in'
 end
 
