@@ -4,6 +4,23 @@ Bundler.require
 
 require './lib/warrior.rb'
 
+=begin
+before do
+	db = Sequel.sqlite
+
+	db.create_table?(:users) do
+		  primary_key :id
+		  String :username
+		  String :password
+			String :email
+			Integer :victories
+			Integer :losses
+		end
+
+		set :db, db
+end
+=end
+
 enable :sessions
 
 get '/' do
@@ -30,6 +47,9 @@ get '/sign_up' do
 end
 
 post '/sign_up' do
+	encrypted_password = BCrypt::Password.create(params[:password])
+	#settings.db.users.insert(username: params[:usuario], password: encrypted_password], email: params[:email], victories: 0, losses: 0)
+	redirect to '/log_in'
 end
 
 get "/teams/:qty" do |qty|
