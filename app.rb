@@ -3,15 +3,81 @@ require 'bundler'
 Bundler.require
 
 require './lib/warrior.rb'
-
 enable :sessions
+
+configure do
+	# Leemos o creamos el archivo "db.db" con
+	# nuestra base de datos
+	db = Sequel.connect("sqlite://db.db")
+
+	# Creamos la tabla `users` si no existe ya
+	db.create_table?(:users) do
+	  primary_key :id
+	  String :username
+	  String :password
+		String :email
+		Integer :total_victories
+		Integer :total_losses
+		Integer :victories_h
+		Integer :losses_h
+		Integer :victories_c
+		Integer :losses_c
+		Integer :unfinishe_games
+	end
+
+	set :db, db
+end
 
 get '/' do
 	erb :'home/home'
 end
 
+get '/play/as' do
+	erb :'play/as'
+end
+
 get '/play' do
 	erb :'play/play'
+end
+
+get '/login' do
+	erb :'login/form', locals: {error: params[:failed]=="true"}
+end
+
+
+post '/login' do
+	user = settings.db[:users].filter(:username => params[:usuario]).first
+	passwords_match = BCrypt::Password.create(request[:password]) == params[:password]
+
+	if user.nil? || !passwords_match
+	  redirect to '/login?failed=true'
+	else
+	  session[:usuario] = user
+	  redirect to '/play'
+	end
+end
+
+get '/signup' do
+	erb :'signup/form'
+end
+
+post '/signup' do
+	encrypted_password = BCrypt::Password.create(params[:password])
+
+	settings.db[:users].insert({
+		username: params[:usuario],
+		password: encrypted_password,
+		email: params[:email],
+		total_victories: 0,
+		total_losses: 0,
+		victories_h: 0,
+		losses_h: 0,
+		victories_c: 0,
+		losses_c: 0,
+		unfinishe_games: 0
+	})
+
+	redirect to '/login'
 end
 
 get "/teams/:qty" do |qty|
@@ -22,7 +88,6 @@ get "/teams/:qty" do |qty|
 			players: players
 		})
 end
-
 
 post "/play/:qty" do |qty|
 	parties = []
@@ -35,12 +100,12 @@ post "/play/:qty" do |qty|
 
 	if qty.to_i == 1
 		parties[1] = []
-		5.times do 
+		5.times do
 			parties[1] << Warrior.send(['normal','strong','fast'].sample)
 		end
 	end
 	session[:parties] = parties
-	redirect to ("/fight/0")	
+	redirect to ("/fight/0")
 end
 
 
@@ -63,7 +128,7 @@ get "/fight/:attacker" do |attacker|
 			}
 
 	}
-	
+
 	erb(:"attack/menu", locals: {
 		enemigos: enemigos,
 		atacantes: atacantes,
