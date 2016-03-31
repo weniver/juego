@@ -6,18 +6,21 @@ require './lib/warrior.rb'
 enable :sessions
 
 configure do
-	DB = Sequel.sqlite
+	# Leemos o creamos el archivo "db.db" con
+	# nuestra base de datos
+	db = Sequel.connect("sqlite://db.db")
 
-	DB.create_table?(:users) do
-		  primary_key :id
-		  String :username
-		  String :password
-			String :email
-			Integer :victories
-			Integer :losses
+	# Creamos la tabla `users` si no existe ya
+	db.create_table?(:users) do
+	  primary_key :id
+	  String :username
+	  String :password
+		String :email
+		Integer :victories
+		Integer :losses
 	end
 
-	set :db, DB
+	set :db, db
 end
 
 get '/' do
@@ -32,30 +35,39 @@ get '/play' do
 	erb :'play/play'
 end
 
-get '/log_in' do
-	erb :'log_in/form'
+get '/login' do
+	erb :'login/form', locals: {error: params[:failed]=="true"}
 end
 
-post '/log_in' do
-	request = settings.db[:users].filter(:username => params[:usuario]).first[:password]
-	c = params[:password]
-	b = BCrypt::Password.new(request)
-	if (!request.nil? && (b==c))
-		session[:usuario] = request
-		redirect to '/play'
+
+post '/login' do
+	user = settings.db[:users].filter(:username => params[:usuario]).first
+	passwords_match = BCrypt::Password.create(request[:password]) == params[:password]
+
+	if user.nil? || !passwords_match
+	  redirect to '/login?failed=true'
 	else
-		erb :'log_in/wrong_password'
+	  session[:usuario] = user
+	  redirect to '/play'
 	end
 end
 
-get '/sign_up' do
-	erb :'sign_up/form'
+get '/signup' do
+	erb :'signup/form'
 end
 
-post '/sign_up' do
+post '/signup' do
 	encrypted_password = BCrypt::Password.create(params[:password])
-	(settings.db)[:users].insert(username: params[:usuario], password: encrypted_password, email: params[:email], victories: 0, losses: 0)
-	redirect to '/log_in'
+
+	settings.db[:users].insert({
+		username: params[:usuario],
+		password: encrypted_password,
+		email: params[:email],
+		victories: 0,
+		losses: 0
+	})
+
+	redirect to '/login'
 end
 
 get "/teams/:qty" do |qty|

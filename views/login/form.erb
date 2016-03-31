@@ -2,11 +2,22 @@
 <html>
 <head>
 	<title>Log In</title>
+	<style>
+	p.error {
+		color: #ff0000;
+		border: 1px solid #f00;
+	}
+	</style>
 </head>
 <body>
+
+	<% if error %>
+	<p class="error">Wrong Password or Username, please try again</p>
+	<% end %>
+
 	<h3>Please Log in:</h3>
 
-	<form action="/log_in" method="POST">
+	<form action="/login" method="POST">
 
 		<label for="usuario"></label>
 		<input id="usuario" name="usuario" type="text" placeholder="Username" required/>
@@ -20,6 +31,6 @@
 		<button type="submit">Log in</button>
 	<br/>
 </form>
-Don't have an account? <a href='/sign_up'>Sign up</a>
+Don't have an account? <a href='/signup'>Sign up</a>
 </body>
 </html>
