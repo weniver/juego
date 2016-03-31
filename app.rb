@@ -58,7 +58,15 @@ end
 
 post '/signup' do
 	encrypted_password = BCrypt::Password.create(params[:password])
-	(settings.db)[:users].insert(username: params[:usuario], password: encrypted_password, email: params[:email], victories: 0, losses: 0)
+
+	settings.db[:users].insert({
+		username: params[:usuario],
+		password: encrypted_password,
+		email: params[:email],
+		victories: 0,
+		losses: 0
+	})
+
 	redirect to '/login'
 end
 
