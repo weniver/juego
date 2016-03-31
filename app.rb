@@ -24,7 +24,6 @@ configure do
 		Integer :losses_c
 		Integer :unfinished_games
 	end
-
 	set :db, db
 end
 
@@ -37,6 +36,9 @@ get '/play/as' do
 end
 
 get '/play' do
+	if params[:guest]=="true"
+		session[:usuario] = 'guest'
+	end
 	erb :'play/play'
 end
 
@@ -171,7 +173,6 @@ post "/attack/:attacker/:enemy" do |attacker, enemy|
 			l += 1
 			tl += 1
 			settings.db[:users].filter(:id => session[:usuario][:id]).update(:losses_h => l,:total_losses => tl)
-
 		end
 
 		redirect to "victory/player%20#{winner}"
