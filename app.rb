@@ -37,21 +37,15 @@ get '/log_in' do
 end
 
 post '/log_in' do
-=begin
-	erb(:'prueba', locals: {
-			prueba: prueba,
-		})
-=end
-
-	request = settings.db[:users].filter(:username => params[:usuario]).first
-	request_pass = request[:password]
-	if (!request.nil? && (request_pass == (BCrypt::Password.create(params[:password]))))
+	request = settings.db[:users].filter(:username => params[:usuario]).first[:password]
+	c = params[:password]
+	b = BCrypt::Password.new(request)
+	if (!request.nil? && (b==c))
 		session[:usuario] = request
 		redirect to '/play'
 	else
 		erb :'log_in/wrong_password'
 	end
-
 end
 
 get '/sign_up' do
