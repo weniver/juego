@@ -155,12 +155,23 @@ post "/attack/:attacker/:enemy" do |attacker, enemy|
 
 	if session[:parties][enemy.to_i].empty?
 		winner = enemy.to_i == 0 ? 2 : 1;
+		#contador de victorias y derrotas
 		if session[:qty]==1
-				v, tv =	session[:usuario][:victories_c], session[:usuario][:total_victories]
-				v += 1
-				tv += 1
-				session[:usuario].update(:victories_c => v,:total_victories => tv)
-				settings.db.update(session[:usuario])
+			v, tv =	session[:usuario][:victories_c], session[:usuario][:total_victories]
+			v += 1
+			tv += 1
+			settings.db[:users].filter(:id => session[:usuario][:id]).update(:victories_c =>v,:total_victories => tv)
+		elsif winner == 1#contador de victorias y derrotas
+			v, tv =	session[:usuario][:victories_h], session[:usuario][:total_victories]
+			v += 1
+			tv += 1
+			settings.db[:users].filter(:id => session[:usuario][:id]).update(:victories_h => v,:total_victories => tv)
+		else
+			l, tl =	session[:usuario][:losses_h], session[:usuario][:total_losses]
+			l += 1
+			tl += 1
+			settings.db[:users].filter(:id => session[:usuario][:id]).update(:losses_h => l,:total_losses => tl)
+
 		end
 
 		redirect to "victory/player%20#{winner}"
@@ -182,9 +193,7 @@ post "/attack/:attacker/:enemy" do |attacker, enemy|
 					l, tl =	session[:usuario][:losses_c], session[:usuario][:total_losses]
 					l += 1
 					tl += 1
-					session[:usuario].update(:losses_c => l,:total_losses => tl)
-					settings.db[:users].filter(:username => params[:usuario])
-					settings.db[:users].filter(:id => session[:usuario]).update(:losses_c => l,:total_losses => tl)
+					settings.db[:users].filter(:id => session[:usuario][:id]).update(:losses_c => l,:total_losses => tl)
 				end
 				redirect to "victory/computer"
 			end
@@ -197,7 +206,7 @@ end
 
 get "/victory/:player" do
 	winner = params[:player].capitalize
-	stats = session[:usuario] #quitar
+	stats = settings.db[:users].filter(:id => session[:usuario][:id]).first #quitar
 	erb(:'victory/player', locals: {
 		winner: winner,
 		stats: stats #quitar
