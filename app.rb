@@ -36,24 +36,19 @@ get '/play' do
 end
 
 get '/login' do
-	erb :'login/form'
+	erb :'login/form', locals: {error: params[:failed]=="true"}
 end
 
 
 post '/login' do
-=begin
-	erb(:'prueba', locals: {
-			prueba: prueba,
-		})
-=end
+	user = settings.db[:users].filter(:username => params[:usuario]).first
+	passwords_match = BCrypt::Password.create(request[:password]) == params[:password]
 
-	request = settings.db[:users].filter(:username => params[:usuario]).first
-	request_pass = request[:password]
-	if (!request.nil? && (request_pass == (BCrypt::Password.create(params[:password]))))
-		session[:usuario] = request
-		redirect to '/play'
+	if user.nil? || !passwords_match
+	  redirect to '/login?failed=true'
 	else
-		erb :'login/wrong_password'
+	  session[:usuario] = user
+	  redirect to '/play'
 	end
 end
 
