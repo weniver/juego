@@ -22,7 +22,7 @@ configure do
 		Integer :losses_h
 		Integer :victories_c
 		Integer :losses_c
-		Integer :unfinishe_games
+		Integer :unfinished_games
 	end
 
 	set :db, db
@@ -47,9 +47,11 @@ end
 
 post '/login' do
 	user = settings.db[:users].filter(:username => params[:usuario]).first
-	passwords_match = BCrypt::Password.create(request[:password]) == params[:password]
-
-	if user.nil? || !passwords_match
+	if user.nil?
+		redirect to '/login?failed=true'
+	end
+	passwords_match = BCrypt::Password.new(user[:password]) == params[:password]
+	if !passwords_match
 	  redirect to '/login?failed=true'
 	else
 	  session[:usuario] = user
@@ -74,7 +76,7 @@ post '/signup' do
 		losses_h: 0,
 		victories_c: 0,
 		losses_c: 0,
-		unfinishe_games: 0
+		unfinished_games: 0
 	})
 
 	redirect to '/login'
@@ -153,6 +155,14 @@ post "/attack/:attacker/:enemy" do |attacker, enemy|
 
 	if session[:parties][enemy.to_i].empty?
 		winner = enemy.to_i == 0 ? 2 : 1;
+		if session[:qty]==1
+				v, tv =	session[:usuario][:victories_c], session[:usuario][:total_victories]
+				v += 1
+				tv += 1
+				session[:usuario].update(:victories_c => v,:total_victories => tv)
+				settings.db.update(session[:usuario])
+		end
+
 		redirect to "victory/player%20#{winner}"
 
 	elsif session[:qty] == 1
@@ -168,6 +178,14 @@ post "/attack/:attacker/:enemy" do |attacker, enemy|
 			end
 
 			if session[:parties][0].empty?
+				if !session[:usuario].nil?
+					l, tl =	session[:usuario][:losses_c], session[:usuario][:total_losses]
+					l += 1
+					tl += 1
+					session[:usuario].update(:losses_c => l,:total_losses => tl)
+					settings.db[:users].filter(:username => params[:usuario])
+					settings.db[:users].filter(:id => session[:usuario]).update(:losses_c => l,:total_losses => tl)
+				end
 				redirect to "victory/computer"
 			end
 			redirect to "/fight/0"
@@ -179,7 +197,9 @@ end
 
 get "/victory/:player" do
 	winner = params[:player].capitalize
+	stats = session[:usuario] #quitar
 	erb(:'victory/player', locals: {
-		winner: winner
+		winner: winner,
+		stats: stats #quitar
 	})
 end
