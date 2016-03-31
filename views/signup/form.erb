@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Sign Up</title>
+</head>
+<body>
+	<h1>Welcome to the arena.</h1>
+</body>
+<br />
+
+<form action="/signup" method="POST">
+
+	<label for="usuario">Username:</label><br/>
+	<input id="usuario" name="usuario" type="text" placeholder="4-10 characters" minlength="4" maxlength="10" required/>
+	<br />
+
+	<label for="pass1">Password:</label><br/>
+	<input id="pass1" type="password" name="password" placeholder="4-20 characters" minlength="4" maxlength="20" required/>
+  <br />
+
+  <label for="pass2"></label>
+  <input id="pass2" type="password" onchange="javascript:myFunction()" name="ConfirmPass" placeholder="Re-enter Password"> <br />
+
+	<label for="email">Email Adress:</label><br/>
+	<input id="email" name="email" type="email" placeholder="your@email.please" required maxlength="254" />
+	<br />
+
+
+  <script>
+    function myFunction() {
+        var pass1 = document.getElementById("pass1").value;
+        var pass2 = document.getElementById("pass2").value;
+        if (pass1 != pass2) {
+          alert("Passwords Do not match!");
+          document.getElementById("pass1").style.background = "#ff6666";
+          document.getElementById("pass2").style.background = "#ff6666";
+        } else {
+					document.getElementById("pass1").style.background = "#BCED91";
+          document.getElementById("pass2").style.background = "#BCED91";
+        }
+    }
+	</script>
+
+	<button type="submit">Sign Up</button>
+
+</form>
+</html>
