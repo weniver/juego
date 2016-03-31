@@ -206,9 +206,9 @@ end
 
 get "/victory/:player" do
 	winner = params[:player].capitalize
-	stats = settings.db[:users].filter(:id => session[:usuario][:id]).first #quitar
+	stats = settings.db[:users].filter(:id => session[:usuario][:id]).first #quitar para el pull
 	erb(:'victory/player', locals: {
 		winner: winner,
-		stats: stats #quitar
+		stats: stats #quitar para el pull
 	})
 end
