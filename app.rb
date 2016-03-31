@@ -16,8 +16,13 @@ configure do
 	  String :username
 	  String :password
 		String :email
-		Integer :victories
-		Integer :losses
+		Integer :total_victories
+		Integer :total_losses
+		Integer :victories_h
+		Integer :losses_h
+		Integer :victories_c
+		Integer :losses_c
+		Integer :unfinishe_games
 	end
 
 	set :db, db
@@ -63,8 +68,13 @@ post '/signup' do
 		username: params[:usuario],
 		password: encrypted_password,
 		email: params[:email],
-		victories: 0,
-		losses: 0
+		total_victories: 0,
+		total_losses: 0,
+		victories_h: 0,
+		losses_h: 0,
+		victories_c: 0,
+		losses_c: 0,
+		unfinishe_games: 0
 	})
 
 	redirect to '/login'
