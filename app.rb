@@ -35,30 +35,36 @@ get '/play' do
 	erb :'play/play'
 end
 
-get '/log_in' do
-	erb :'log_in/form'
+get '/login' do
+	erb :'login/form'
 end
 
-post '/log_in' do
-	request = settings.db[:users].filter(:username => params[:usuario]).first[:password]
-	c = params[:password]
-	b = BCrypt::Password.new(request)
-	if (!request.nil? && (b==c))
+
+post '/login' do
+=begin
+	erb(:'prueba', locals: {
+			prueba: prueba,
+		})
+=end
+
+	request = settings.db[:users].filter(:username => params[:usuario]).first
+	request_pass = request[:password]
+	if (!request.nil? && (request_pass == (BCrypt::Password.create(params[:password]))))
 		session[:usuario] = request
 		redirect to '/play'
 	else
-		erb :'log_in/wrong_password'
+		erb :'login/wrong_password'
 	end
 end
 
-get '/sign_up' do
-	erb :'sign_up/form'
+get '/signup' do
+	erb :'signup/form'
 end
 
-post '/sign_up' do
+post '/signup' do
 	encrypted_password = BCrypt::Password.create(params[:password])
 	(settings.db)[:users].insert(username: params[:usuario], password: encrypted_password, email: params[:email], victories: 0, losses: 0)
-	redirect to '/log_in'
+	redirect to '/login'
 end
 
 get "/teams/:qty" do |qty|
