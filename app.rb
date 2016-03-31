@@ -6,18 +6,21 @@ require './lib/warrior.rb'
 enable :sessions
 
 configure do
-	DB = Sequel.sqlite
+	# Leemos o creamos el archivo "db.db" con
+	# nuestra base de datos
+	db = Sequel.connect("sqlite://db.db")
 
-	DB.create_table?(:users) do
-		  primary_key :id
-		  String :username
-		  String :password
-			String :email
-			Integer :victories
-			Integer :losses
+	# Creamos la tabla `users` si no existe ya
+	db.create_table?(:users) do
+	  primary_key :id
+	  String :username
+	  String :password
+		String :email
+		Integer :victories
+		Integer :losses
 	end
 
-	set :db, DB
+	set :db, db
 end
 
 get '/' do
