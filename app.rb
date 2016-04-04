@@ -22,38 +22,7 @@ configure do
 		Integer :losses_h
 		Integer :victories_c
 		Integer :losses_c
-		Integer :unfinished_games
-	end
-
-
-	db.create_table?(:stats) do
-		Integer :number_of_users
-		Integer :games_users
-		Integer :games_guests
-		Integer :victories_users
-		Integer :victories_guests
-		Integer :losses_users
-		Integer :losses_guests
-		Integer :vs_computer
-		Integer :vs_human
-		Integer :computer_victories
-		Integer :computer_losses
-	end
-
-	if db[:stats].empty?
-		db[:stats].insert({
-			number_of_users: 0,
-			games_users: 0,
-			games_guests: 0,
-			victories_users: 0,
-			victories_guests: 0,
-			losses_users: 0,
-			losses_guests: 0,
-			vs_computer: 0,
-			vs_human: 0,
-			computer_victories: 0,
-			computer_losses: 0,
-		})
+		Integer :unfinishe_games
 	end
 
 	set :db, db
@@ -68,9 +37,6 @@ get '/play/as' do
 end
 
 get '/play' do
-	if params[:guest]=="true"
-		session[:usuario] = 'guest'
-	end
 	erb :'play/play'
 end
 
@@ -81,11 +47,9 @@ end
 
 post '/login' do
 	user = settings.db[:users].filter(:username => params[:usuario]).first
-	if user.nil?
-		redirect to '/login?failed=true'
-	end
-	passwords_match = BCrypt::Password.new(user[:password]) == params[:password]
-	if !passwords_match
+	passwords_match = BCrypt::Password.create(request[:password]) == params[:password]
+
+	if user.nil? || !passwords_match
 	  redirect to '/login?failed=true'
 	else
 	  session[:usuario] = user
@@ -110,7 +74,7 @@ post '/signup' do
 		losses_h: 0,
 		victories_c: 0,
 		losses_c: 0,
-		unfinished_games: 0
+		unfinishe_games: 0
 	})
 
 	redirect to '/login'
@@ -175,17 +139,11 @@ get "/fight/:attacker" do |attacker|
 end
 
 post "/attack/:attacker/:enemy" do |attacker, enemy|
-	parties = session[:parties]
 
-	warriors = {
-		atacante: parties[attacker.to_i],
-		enemigo: parties[enemy.to_i]
-	}
-	atacante = warriors[:atacante].first
-	enemigo = warriors[:enemigo][params[:warrior].to_i]
+	atacante = session[:parties][attacker.to_i].first
+	enemigo = session[:parties][enemy.to_i][params[:warrior].to_i]
 
 	atacante.attack(enemigo)
-
 	if enemigo.dead?
 		session[:parties][enemy.to_i].delete(enemigo)
 	end
@@ -193,27 +151,8 @@ post "/attack/:attacker/:enemy" do |attacker, enemy|
 	first_to_last = session[:parties][attacker.to_i].shift
 	session[:parties][attacker.to_i] << first_to_last
 
-	if parties[enemy.to_i].empty?
-		winner = 2 - enemy.to_i
-		#contador de victorias y derrotas
-			total_key = :total_victories
-			if session[:qty] == 1
-				key = :victories_c
-			elsif winner == 1#contador de victorias y derrotas
-				key = :victories_h
-			else
-				key = :losses_h
-				total_key = :total_losses
-			end
-
-			v = session[:usuario][key]
-			tv = session[:usuario][total_key]
-			v += 1
-			tv += 1
-			settings.db[:users].filter(:id => session[:usuario][:id]).update({
-				key => v,
-				total_key => tv
-			})
+	if session[:parties][enemy.to_i].empty?
+		winner = enemy.to_i == 0 ? 2 : 1;
 		redirect to "victory/player%20#{winner}"
 
 	elsif session[:qty] == 1
@@ -229,12 +168,6 @@ post "/attack/:attacker/:enemy" do |attacker, enemy|
 			end
 
 			if session[:parties][0].empty?
-					if !session[:usuario].nil?
-						l, tl =	session[:usuario][:losses_c], session[:usuario][:total_losses]
-						l += 1
-						tl += 1
-						settings.db[:users].filter(:id => session[:usuario][:id]).update(:losses_c => l,:total_losses => tl)
-					end
 				redirect to "victory/computer"
 			end
 			redirect to "/fight/0"
@@ -246,20 +179,7 @@ end
 
 get "/victory/:player" do
 	winner = params[:player].capitalize
-	unless session[:usuario] == 'guest'
-		stats = settings.db[:users].filter(:id => session[:usuario][:id]).first #quitar para el pull
-	end
-	stats = session[:usuario]
 	erb(:'victory/player', locals: {
-		winner: winner,
-		stats: stats #quitar para el pull
+		winner: winner
 	})
-end
-
-get '/stats' do
-	data = {
-		stats: settings.db[:stats].first
-	}
-
-	erb(:"stats/display", locals: data)
 end
