@@ -179,6 +179,12 @@ end
 
 get "/victory/:player" do
 	winner = params[:player].capitalize
+<<<<<<< Updated upstream
+=======
+
+	stats = settings.db[:users].filter(:id => session[:usuario][:id]).first #quitar para el pull
+
+>>>>>>> Stashed changes
 	erb(:'victory/player', locals: {
 		winner: winner
 	})
