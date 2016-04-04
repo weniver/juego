@@ -8,55 +8,34 @@ enable :sessions
 configure do
 	# Leemos o creamos el archivo "db.db" con
 	# nuestra base de datos
-	db = Sequel.connect("sqlite://db.db")
+	DB = Sequel.connect("sqlite://juego.db")
 
-	# Creamos la tabla `users` si no existe ya
-	db.create_table?(:users) do
+# Creamos la tabla `users` si no existe ya
+	DB.create_table?(:users) do
 	  primary_key :id
 	  String :username
 	  String :password
 		String :email
-		Integer :total_victories
-		Integer :total_losses
-		Integer :victories_h
-		Integer :losses_h
-		Integer :victories_c
-		Integer :losses_c
-		Integer :unfinished_games
 	end
-
-
-	db.create_table?(:stats) do
-		Integer :number_of_users
-		Integer :games_users
-		Integer :games_guests
-		Integer :victories_users
-		Integer :victories_guests
-		Integer :losses_users
-		Integer :losses_guests
-		Integer :vs_computer
-		Integer :vs_human
-		Integer :computer_victories
-		Integer :computer_losses
+#los usuarios puede tener solo una party activa con 5 warriors maximo
+	DB.create_table?(:parties) do
+		primary_key :id
+		foreign_key :users_id, :users
+		String :name
+		Integer :health
+		Integer :strength
+		String :human
 	end
-
-	if db[:stats].empty?
-		db[:stats].insert({
-			number_of_users: 0,
-			games_users: 0,
-			games_guests: 0,
-			victories_users: 0,
-			victories_guests: 0,
-			losses_users: 0,
-			losses_guests: 0,
-			vs_computer: 0,
-			vs_human: 0,
-			computer_victories: 0,
-			computer_losses: 0,
-		})
-	end
-
-	set :db, db
+#los juegos tienen dos parties, el turno es para recordar entre sesiones que
+#jugador puede atacar
+	DB.create_table?(:games)
+		primary_key :id
+		foreign_key :party1_id, :parties
+		foreign_key :party2_id, :parties
+		foreign_key :winner_id, :users
+		Integer :turn #even or odd
+		String :state #over or active
+	set :db, DB
 end
 
 get '/' do
