@@ -15,10 +15,10 @@ configure do
 		String :email
 	end
 #los usuarios puede tener solo una party activa con 5 warriors maximo
-=begin
-	DB.create_table?(:parties) do
+
+	DB.create_table?(:partys) do
 		primary_key :id
-		foreign_key :users_id, :users
+		foreign_key :game_id, :games
 		String :name
 		Integer :health
 		Integer :strength
@@ -26,14 +26,14 @@ configure do
 	end
 #los juegos tienen dos parties, el turno es para recordar entre sesiones que
 #jugador puede atacar
-	DB.create_table?(:games)
+	DB.create_table?(:games) do
 		primary_key :id
-		foreign_key :party1_id, :parties
-		foreign_key :party2_id, :parties
-		foreign_key :winner_id, :users
+		foreign_key :user_id, :users
+		String :winner
 		Integer :turn #even or odd
 		String :state #over or active
-=end
+  end
+
 	set :db, DB
 end
 

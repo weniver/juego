@@ -1,4 +1,5 @@
 class User < Sequel::Model
+  one_to_many :games
 #primero trate de hacerlo con initialize y new pero decia que tenia un numero incorrecto de argumentos
   def self.signup username, password, email
     if !User[:username => username].nil? || !User[:email => email].nil?
@@ -28,5 +29,4 @@ class User < Sequel::Model
   	  return false
   	end
   end
-
 end
