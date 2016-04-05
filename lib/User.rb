@@ -1,25 +1,26 @@
 class User < Sequel:Model
   def initialize user, password, email
     if Users[:user => user].exists? || Users[:email => email].exits?
-      return
+      return redirect to '/signup?error=true'
     else
       encrypted_password= BCrypt::Password.create(password)
       User.create(:username => user,
                   :password => encrypted_password,
                   :email => email
                  )
+      return true
     end
   end
 
   def self.authenticate? user, password
     if !Users[:user => user].exists?
-  		return redirect to '/login?failed=true'
+  		return false
   	end
 
   	if !match? user, password
-  	  return redirect to '/login?failed=true'
+  	  return false
   	else
-  	  return session = Users.filter(:username => user).first
+  	  return true
   	end
   end
 

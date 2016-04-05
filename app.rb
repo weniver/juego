@@ -3,6 +3,7 @@ require 'bundler'
 Bundler.require
 
 require './lib/warrior.rb'
+require './lib/user.rb'
 enable :sessions
 
 configure do
@@ -57,43 +58,22 @@ get '/login' do
 	erb :'login/form', locals: {error: params[:failed]=="true"}
 end
 
-
 post '/login' do
-	user = settings.db[:users].filter(:username => params[:usuario]).first
-	if user.nil?
-		redirect to '/login?failed=true'
-	end
-	passwords_match = BCrypt::Password.new(user[:password]) == params[:password]
-	if !passwords_match
-	  redirect to '/login?failed=true'
+	if User.authenticate? params[:username], params[:password]
+		session[:usuario] = Users.filter(:username => params[:username]).first
+		redirect to '/play'
 	else
-	  session[:usuario] = user
-	  redirect to '/play'
+		redirect to '/login?failed=true'
 	end
 end
 
 get '/signup' do
-	erb :'signup/form'
+	erb :'signup/form', locals: {error: params[:failed]=="true"}
 end
 
 post '/signup' do
 	User.new params[:username], params[:password], params[:email]
-
-	encrypted_password = BCrypt::Password.create(params[:password])
-
-	settings.db[:users].insert({
-		username: params[:usuario],
-		password: encrypted_password,
-		email: params[:email],
-		total_victories: 0,
-		total_losses: 0,
-		victories_h: 0,
-		losses_h: 0,
-		victories_c: 0,
-		losses_c: 0,
-		unfinished_games: 0
-	})
-
+#checar si ya existe el usuario or email se redirige a /sigup?error=true
 	redirect to '/login'
 end
 

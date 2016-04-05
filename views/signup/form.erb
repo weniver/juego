@@ -2,8 +2,17 @@
 <html>
 <head>
 	<title>Sign Up</title>
+	<style>
+	p.error {
+		color: #ff0000;
+		border: 1px solid #f00;
+	}
+	</style>
 </head>
 <body>
+	<% if error %>
+	<p class="error">Invalid username or password. Please choose another one.</p>
+	<% end %>
 	<h1>Welcome to the arena.</h1>
 </body>
 <br />
