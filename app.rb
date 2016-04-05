@@ -77,6 +77,8 @@ get '/signup' do
 end
 
 post '/signup' do
+	User.new params[:username], params[:password], params[:email]
+
 	encrypted_password = BCrypt::Password.create(params[:password])
 
 	settings.db[:users].insert({
