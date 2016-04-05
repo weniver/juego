@@ -26,7 +26,6 @@ class User < Sequel::Model
   	  return true
   	else
   	  return false
-      p '2'
   	end
   end
 
