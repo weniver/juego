@@ -1,33 +1,32 @@
 class User < Sequel::Model
-
-  def initialize user, password, email
-    if Users[:user => user].exists? || Users[:email => email].exits?
-      return redirect to '/signup?error=true'
+#primero trate de hacerlo con initialize y new pero decia que tenia un numero incorrecto de argumentos
+  def self.signup username, password, email
+    if !User[:username => username].nil? || !User[:email => email].nil?
+      return '/signup?failed=true'
     else
       encrypted_password= BCrypt::Password.create(password)
-      User.create(:username => user,
+      User.create(:username => username,
                   :password => encrypted_password,
                   :email => email
                  )
-      return true
+      return '/login?success=true'
     end
   end
 
-  def self.authenticate? user, password
-    if !Users[:user => user].exists?
+  def match? username, password
+    return BCrypt::Password.new(User.filter(:username => username)[:password]) == password
+  end
+
+  def self.authenticate? username, password
+    if !User[:username => username].nil?
   		return false
   	end
 
-  	if !match? user, password
+  	unless match? (username, password)
   	  return false
   	else
   	  return true
   	end
-  end
-
-  def match? user, password
-    return BCrypt::Password.new(Users.filter(:username => user)[:password]) == password
-
   end
 
 end

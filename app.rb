@@ -2,10 +2,6 @@ require 'rubygems'
 require 'bundler'
 Bundler.require
 
-require './lib/warrior.rb'
-require './lib/user.rb'
-enable :sessions
-
 configure do
 	# Leemos o creamos el archivo "db.db" con
 	# nuestra base de datos
@@ -19,6 +15,7 @@ configure do
 		String :email
 	end
 #los usuarios puede tener solo una party activa con 5 warriors maximo
+=begin
 	DB.create_table?(:parties) do
 		primary_key :id
 		foreign_key :users_id, :users
@@ -36,8 +33,13 @@ configure do
 		foreign_key :winner_id, :users
 		Integer :turn #even or odd
 		String :state #over or active
+=end
 	set :db, DB
 end
+
+require './lib/warrior.rb'
+require './lib/user.rb'
+enable :sessions
 
 get '/' do
 	erb :'home/home'
@@ -55,7 +57,10 @@ get '/play' do
 end
 
 get '/login' do
-	erb :'login/form', locals: {error: params[:failed]=="true"}
+	erb :'login/form', locals: {
+		error: params[:failed]=="true",
+		success: params[:success]=="true"
+	}
 end
 
 post '/login' do
@@ -72,9 +77,9 @@ get '/signup' do
 end
 
 post '/signup' do
-	User.new params[:username], params[:password], params[:email]
-#checar si ya existe el usuario or email se redirige a /sigup?error=true
-	redirect to '/login'
+	url = User.signup params[:username], params[:password], params[:email]
+#checar si ya existe el usuario or email se redirige a /sigup?error=true o login
+	redirect to url
 end
 
 get "/teams/:qty" do |qty|
@@ -216,10 +221,7 @@ get "/victory/:player" do
 	})
 end
 
-get '/stats' do
-	data = {
-		stats: settings.db[:stats].first
-	}
-
-	erb(:"stats/display", locals: data)
+get '/table' do
+	todo = User.all.each{|user| p user}
+	erb :table, locals: {todo: todo}
 end

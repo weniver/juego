@@ -7,12 +7,18 @@
 		color: #ff0000;
 		border: 1px solid #f00;
 	}
+	p.success {
+		color: #009900;
+		border: 1px solid #009900;
+	}
 	</style>
 </head>
 <body>
 
 	<% if error %>
 	<p class="error">Wrong Password or Username, please try again</p>
+	<% elsif success%>
+	<p class="success">Account created. Ready to fight!</p>
 	<% end %>
 
 	<h3>Please Log in:</h3>
