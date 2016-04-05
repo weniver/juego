@@ -13,19 +13,20 @@ class User < Sequel::Model
     end
   end
 
-  def match? username, password
-    return BCrypt::Password.new(User.filter(:username => username)[:password]) == password
+  def self.match? username, password
+    return BCrypt::Password.new(User.where(:username => username).first[:password]) == password
   end
 
   def self.authenticate? username, password
-    if !User[:username => username].nil?
-  		return false
+    if User[:username => username].nil?
+      return false
   	end
 
-  	unless match? (username, password)
-  	  return false
-  	else
+  	if User.match? username, password
   	  return true
+  	else
+  	  return false
+      p '2'
   	end
   end
 

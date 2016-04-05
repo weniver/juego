@@ -65,7 +65,7 @@ end
 
 post '/login' do
 	if User.authenticate? params[:username], params[:password]
-		session[:usuario] = Users.filter(:username => params[:username]).first
+		session[:usuario] = User.filter(:username => params[:username]).first
 		redirect to '/play'
 	else
 		redirect to '/login?failed=true'
