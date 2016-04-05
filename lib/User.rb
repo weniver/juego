@@ -1,4 +1,5 @@
-class User < Sequel:Model
+class User < Sequel::Model
+
   def initialize user, password, email
     if Users[:user => user].exists? || Users[:email => email].exits?
       return redirect to '/signup?error=true'
@@ -24,7 +25,7 @@ class User < Sequel:Model
   	end
   end
 
-  def match? user password
+  def match? user, password
     return BCrypt::Password.new(Users.filter(:username => user)[:password]) == password
 
   end
