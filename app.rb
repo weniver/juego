@@ -22,7 +22,7 @@ configure do
 		String :name
 		Integer :health
 		Integer :strength
-		String :human
+		String :player #1 or 2
 	end
 #los juegos tienen dos parties, el turno es para recordar entre sesiones que
 #jugador puede atacar
@@ -32,6 +32,7 @@ configure do
 		String :winner
 		Integer :turn #even or odd
 		String :state #over or active
+		String :vscomp #true or false
   end
 
 	set :db, DB
