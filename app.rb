@@ -94,8 +94,7 @@ end
 
 post "/play/:qty" do |qty|
 	Party.new qty.to_i, params[:player]
-	#guardo la party en la session por si la partida se queda inconclusa se resuma
-	session[:party]= DB[:]
+	#Aqui debo crear el Juego.new y debe linkearse de alguna manera a la party. Luego el id del juego creado debe guardarse en la session del usuario para poder regresar a el si todavia no se ha acabado
 	redirect to ("/fight/0")
 end
 
