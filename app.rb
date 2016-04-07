@@ -93,21 +93,9 @@ get "/teams/:qty" do |qty|
 end
 
 post "/play/:qty" do |qty|
-	parties = []
-	session[:qty] = qty.to_i
-	params[:player].each do |id, players|
-		parties << players.map { |player|
-			Warrior.send(player.to_sym)
-		}
-	end
-
-	if qty.to_i == 1
-		parties[1] = []
-		5.times do
-			parties[1] << Warrior.send(['normal','strong','fast'].sample)
-		end
-	end
-	session[:parties] = parties
+	Party.new qty.to_i, params[:player]
+	#guardo la party en la session por si la partida se queda inconclusa se resuma
+	session[:party]= DB[:]
 	redirect to ("/fight/0")
 end
 
