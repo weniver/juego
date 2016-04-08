@@ -13,10 +13,10 @@ class Warrior
 	def initialize (name, health=@@basehealth, strength=@@basestrength)
 		@name = name
 		@health = health
-		@strength = strength	
+		@strength = strength
 	end
 	#clases de warrior
-	def self.normal 
+	def self.normal
 		health = @@basehealth + (100 + rand(0..100))
 		strength = @@basestrength + (15 + rand(0..15))
 		Warrior.new('Normal', health, strength)

@@ -2,7 +2,7 @@ class Party < Sequel::Model
   require './lib/warrior.rb'
   many_to_one :game
 
-  def initialize num_players, player_choice #player_choice es un hash id =>[]
+  def initialize num_players, player_choice, game_id#player_choice es un hash id =>[]
     party = {}
     player_choice.each do |id,players|
       party_array << players.map { |player|
@@ -15,6 +15,8 @@ class Party < Sequel::Model
                       :health => warrior.health.to_i,
                       :strength => warrior.strength.to_i,
                       :player => player_num
+                      :dead => 'no'
+                      :game_id => game_id
           )
         end
       end

@@ -23,6 +23,7 @@ configure do
 		Integer :health
 		Integer :strength
 		String :player #1 or 2
+		String :dead #yes or no
 	end
 #los juegos tienen dos parties, el turno es para recordar entre sesiones que
 #jugador puede atacar
@@ -93,8 +94,11 @@ get "/teams/:qty" do |qty|
 end
 
 post "/play/:qty" do |qty|
-	Party.new qty.to_i, params[:player]
-	#Aqui debo crear el Juego.new y debe linkearse de alguna manera a la party. Luego el id del juego creado debe guardarse en la session del usuario para poder regresar a el si todavia no se ha acabado
+	user_id = session[:usuario][:id]
+	Game.new user_id, qty.to_i
+	game_id = Game.filter(:user_id => session[:usuario][:id]).last[:id]
+	Party.new qty.to_i, params[:player], game_id
+	#AQUI VOY
 	redirect to ("/fight/0")
 end
 
