@@ -7,7 +7,7 @@ class Game < Sequel::Model
 
     Game.create(:user_id => user_id,
                 :winner => 'none' ,
-                :state => 'incomplete',
+                :state => 'active',
                 :turn => 0,
                 :vscomp => vs_comp
     )

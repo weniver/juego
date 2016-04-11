@@ -48,9 +48,9 @@ class Warrior
 	def critical
 		luck = rand(1..100)
 		case luck
-		when 1
+		when 1..5
 			3
-		when 2..20
+		when 5..20
 			2
 		else
 			1
