@@ -23,7 +23,7 @@ configure do
 		Integer :health
 		Integer :strength
 		Integer :party_position
-		String :player #1 or 2
+		String :player #1 or 2 or computer
 		String :dead #yes or no
 	end
 #los juegos tienen dos parties, el turno es para recordar entre sesiones que
@@ -34,7 +34,7 @@ configure do
 		String :winner
 		Integer :turn #even or odd
 		String :state #over or active
-		String :vscomp #true or false
+		String :vscomp #yes or no
   end
 
 	set :db, DB
@@ -116,19 +116,25 @@ end
 
 
 get "/fight/:turn" do |turn|
-	if turn.to_i.even? then enemy = 2 else enemy = 1 end
+	if session[:game][:vscomp] == 'yes'
+		enemy = 'computer'
+	elsif turn.to_i.even? then enemy = '2' else enemy = '1'
+	end
 
+	enemigos = Party.filter(:game_id =>session[:game][:id]).filter(:player => enemy)
 
-
-	enemigos = session[:parties][enemy].each_with_index.map { |w, index|
+	enemigos.each{ |w|
 			{
-				name: w.name,
-				health: w.health,
-				index: index
+				name: w[:name],
+				health: w.[:health],
+				index: w[:party_position],
+				dead: w[:dead]
 			}
 	}
 
-	atacantes = session[:parties][attacker.to_i].each.map { |w|
+	atacantes = Party.filter(:game_id =>session[:game][:id]).filter(:player => enemy)
+
+	{ |w|
 			{
 				name: w.name,
 				health: w.health,
@@ -145,7 +151,7 @@ get "/fight/:turn" do |turn|
 		attacker: attacker
 	})
 end
-
+end
 post "/attack/:attacker/:enemy" do |attacker, enemy|
 	parties = session[:parties]
 

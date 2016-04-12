@@ -11,7 +11,7 @@ class Party < Sequel::Model
       party[id] = party_array
       party.each do |player_num,warriors|
         warriors.each do |warrior|
-          n = 1
+          n = 1 #1-5
           Party.create(:name => warrior.name,
                       :health => warrior.health.to_i,
                       :strength => warrior.strength.to_i,
