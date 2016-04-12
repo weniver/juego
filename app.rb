@@ -104,7 +104,6 @@ get "/teams/:qty" do |qty|
 end
 
 post "/play/:qty" do |qty|
-
 		user_id = session[:usuario][:id]
 		Game.new user_id, qty.to_i
 		session[:game] = Game.last
@@ -112,7 +111,6 @@ post "/play/:qty" do |qty|
 		Party.new qty.to_i, params[:player], game_id
 		turn = session[:game][:turn]
 	end
-	#AQUI VOY
 	redirect to ("/fight/#{turn}")
 end
 
