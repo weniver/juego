@@ -22,6 +22,7 @@ configure do
 		String :name
 		Integer :health
 		Integer :strength
+		Integer :party_position
 		String :player #1 or 2
 		String :dead #yes or no
 	end
@@ -68,6 +69,15 @@ end
 post '/login' do
 	if User.authenticate? params[:username], params[:password]
 		session[:usuario] = User.filter(:username => params[:username]).first
+		#Aqui checa si el usuario ya tiene un juego activo, si lo tiene te
+		#redirige a donde se quedo el juego anterior.
+		last_game = Game.filter(:user_id => session[:usuario][:id]).last
+		if last_game[:state] == 'active'
+			session[:game] = last_game
+			turn = session[:game][:turn]
+			redirect to ("/fight/#{turn}")
+		end
+
 		redirect to '/play'
 	else
 		redirect to '/login?failed=true'
@@ -94,18 +104,24 @@ get "/teams/:qty" do |qty|
 end
 
 post "/play/:qty" do |qty|
-	user_id = session[:usuario][:id]
-	Game.new user_id, qty.to_i
-	game_id = Game.filter(:user_id => session[:usuario][:id]).last[:id]
-	Party.new qty.to_i, params[:player], game_id
+
+		user_id = session[:usuario][:id]
+		Game.new user_id, qty.to_i
+		session[:game] = Game.last
+		game_id = session[:game][:id]
+		Party.new qty.to_i, params[:player], game_id
+		turn = session[:game][:turn]
+	end
 	#AQUI VOY
-	redirect to ("/fight/0")
+	redirect to ("/fight/#{turn}")
 end
 
 
-get "/fight/:attacker" do |attacker|
-	enemy = attacker.to_i == 0 ? 1 : 0;
-	turn = attacker.to_i + 1
+get "/fight/:turn" do |turn|
+	if turn.to_i.even? then enemy = 2 else enemy = 1 end
+
+
+
 	enemigos = session[:parties][enemy].each_with_index.map { |w, index|
 			{
 				name: w.name,
