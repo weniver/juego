@@ -31,24 +31,22 @@ class Game < Sequel::Model
 
   def self.party_helper enemy, attacker, game_in_session
 
-  	enemigos = Party.filter(:game_id =>game_in_session[:id]).filter(:player => enemy).each { |w|
+  	enemies = Party.filter(:game_id =>game_in_session[:id]).filter(:player => enemy).each { |w|
   			{
   				name: w[:name],
-  				health: w.[:health],
+  				health: w[:health],
   				index: w[:party_position],
   				dead: w[:dead]
   			}
   	}
 
-  	enemigos.each{ |w|
-  			{
-  				name: w[:name],
-  				health: w.[:health],
-  				index: w[:party_position],
-  				dead: w[:dead]
-  			}
-  	}
-
-  	atacantes = Party.filter(:game_id =>game_in_session[:id]).filter(:player => enemy)
+  	attackers = Party.filter(:game_id =>game_in_session[:id]).filter(:player => attacker).each{ |w|
+      {
+        name: w[:name],
+        health: w[:health],
+        attack: w[:strength]
+      }
+    }
+    return enemies, attackers
   end
 end

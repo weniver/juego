@@ -116,42 +116,19 @@ end
 
 
 get "/fight/:turn" do |turn|
-	if session[:game][:vscomp] == 'yes'
-		enemy = 'computer'
-	elsif turn.to_i.even? then enemy = '2' else enemy = '1'
-	end
+	enemy, attacker = Game.enemy_and_attacker turn, session[:game]
+	enemies, attackers = Game.party_helper enemy, attacker, session[:game]
 
-	enemigos = Party.filter(:game_id =>session[:game][:id]).filter(:player => enemy)
-
-	enemigos.each{ |w|
-			{
-				name: w[:name],
-				health: w.[:health],
-				index: w[:party_position],
-				dead: w[:dead]
-			}
-	}
-
-	atacantes = Party.filter(:game_id =>session[:game][:id]).filter(:player => enemy)
-
-	{ |w|
-			{
-				name: w.name,
-				health: w.health,
-				attack: w.strength
-			}
-
-	}
-
+#<><><>AQUI VOY TODAVIA NO PONGO LO DEL ERB<><><><>
 	erb(:"attack/menu", locals: {
-		enemigos: enemigos,
-		atacantes: atacantes,
+		enemies: enemies,
+		attackers: attackers,
 		turn: turn,
 		enemy: enemy,
 		attacker: attacker
 	})
 end
-end
+
 post "/attack/:attacker/:enemy" do |attacker, enemy|
 	parties = session[:parties]
 

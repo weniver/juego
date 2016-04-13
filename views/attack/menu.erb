@@ -2,7 +2,7 @@
 <h3>Attacking team order:</h3>
 
 <ol>
-<% atacantes.each do |atacante| %>
+<% attackers.each do |atacante| %>
 
 	<li><%= atacante[:name] %> Warrior: <%= atacante[:health] %>hp -- <%= atacante[:attack]%>attack.</li>
 	<% end %>
@@ -11,7 +11,7 @@
 <h3>Enemy team:</h3>
 
 <form method="post" action="/attack/<%= attacker %>/<%= enemy %>">
-		<% enemigos.each do |enemigo| %>
+		<% enemies.each do |enemigo| %>
 			<input type="radio" name="warrior" value="<%= enemigo[:index] %>" id="warrior-<%= enemigo[:index] %>"/>
 			<label for="warrior-<%= enemigo[:index] %>"><%= enemigo[:name] %> Warrior HP: <%= enemigo[:health] %></label>
 		</br>
