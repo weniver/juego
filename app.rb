@@ -5,6 +5,7 @@ Bundler.require
 configure do
 	# Leemos o creamos el archivo "db.db" con
 	# nuestra base de datos
+	#LO CAMBIE A DB EN MAYUSCULAS POR QUE ASI DICE SEQUEL QUE LO PREFIERE
 	DB = Sequel.connect("sqlite://juego.db")
 
 # Creamos la tabla `users` si no existe ya
