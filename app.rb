@@ -6,16 +6,24 @@ configure do
 	# Leemos o creamos el archivo "db.db" con
 	# nuestra base de datos
 	#LO CAMBIE A DB EN MAYUSCULAS POR QUE ASI DICE SEQUEL QUE LO PREFIERE
-	DB = Sequel.connect("sqlite://juego.db")
+	DB = Sequel.connect("mysql://root:asdf1234@localhost/juego")
 
 # Creamos la tabla `users` si no existe ya
 	DB.create_table?(:users) do
 	  primary_key :id
-	  String :username
+	  String :username, unique: true
 	  String :password
-		String :email
+		String :email, unique: true
 	end
-#los usuarios puede tener solo una party activa con 5 warriors maximo
+
+	DB.create_table?(:games) do
+		primary_key :id
+		foreign_key :user_id, :users
+		String :winner #1,2 o computer
+		Integer :turn #even or odd
+		Boolean :active
+		Boolean :vscomp
+	end
 
 	DB.create_table?(:partys) do
 		primary_key :id
@@ -29,15 +37,6 @@ configure do
 	end
 #los juegos tienen dos parties, el turno es para recordar entre sesiones que
 #jugador puede atacar
-	DB.create_table?(:games) do
-		primary_key :id
-		foreign_key :user_id, :users
-		String :winner
-		Integer :turn #even or odd
-		String :state #over or active
-		String :vscomp #yes or no
-  end
-
 	set :db, DB
 end
 
