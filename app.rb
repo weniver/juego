@@ -1,13 +1,14 @@
 require 'rubygems'
 require 'bundler'
+require 'yaml'
 Bundler.require
 
 configure do
 	# Leemos o creamos el archivo "db.db" con
 	# nuestra base de datos
 	#LO CAMBIE A DB EN MAYUSCULAS POR QUE ASI DICE SEQUEL QUE LO PREFIERE
-	DB = Sequel.connect("mysql://root:asdf1234@localhost/juego")
-
+	db_config = YAML.load(File.read("config/database.yaml"))
+	DB = Sequel.connect(db_config)
 # Creamos la tabla `users` si no existe ya
 	DB.create_table?(:users) do
 	  primary_key :id
@@ -104,13 +105,13 @@ get "/teams/:qty" do |qty|
 end
 
 post "/play/:qty" do |qty|
-		user_id = session[:usuario][:id]
-		Game.new user_id, qty.to_i
-		session[:game] = Game.last
-		game_id = session[:game][:id]
-		Party.new qty.to_i, params[:player], game_id
-		turn = session[:game][:turn]
-	end
+	user_id = session[:usuario][:id]
+	Game.new user_id, qty.to_i
+	session[:game] = Game.last
+	game_id = session[:game][:id]
+	Party.new qty.to_i, params[:player], game_id
+	turn = session[:game][:turn]
+
 	redirect to ("/fight/#{turn}")
 end
 
